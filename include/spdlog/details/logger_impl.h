@@ -57,6 +57,7 @@ inline void spdlog::logger::set_pattern(const std::string& pattern, pattern_time
     _set_pattern(pattern, pattern_time);
 }
 
+
 template <typename... Args>
 inline void spdlog::logger::log(level::level_enum lvl, const char* fmt, const Args&... args)
 {
@@ -163,6 +164,94 @@ inline void spdlog::logger::critical(const char* fmt, const Arg1 &arg1, const Ar
     log(level::critical, fmt, arg1, args...);
 }
 
+#ifdef SPDLOG_ENABLE_LOGMSG_METADATA
+
+template <typename... Args>
+inline void spdlog::logger::log(level::level_enum lvl, attrmap_type& ma, const char* fmt, const Args&... args)
+{
+    if (!should_log(lvl)) return;
+
+    try
+    {
+        details::log_msg log_msg(&_name, lvl, std::move(ma));
+
+#if defined(SPDLOG_FMT_PRINTF)
+        fmt::printf(log_msg.raw, fmt, args...);
+#else
+        log_msg.raw.write(fmt, args...);
+#endif
+        _sink_it(log_msg);
+    }
+    catch (const std::exception &ex)
+    {
+        _err_handler(ex.what());
+    }
+    catch(...)
+    {
+        _err_handler("Unknown exception in logger " + _name);
+        throw;
+    }
+}
+
+template <typename... Args>
+inline void spdlog::logger::log(level::level_enum lvl, attrmap_type& ma, const char* msg)
+{
+    if (!should_log(lvl)) return;
+    try
+    {
+        details::log_msg log_msg(&_name, lvl, std::move(ma));
+        log_msg.raw << msg;
+        _sink_it(log_msg);
+    }
+    catch (const std::exception &ex)
+    {
+        _err_handler(ex.what());
+    }
+    catch (...)
+    {
+        _err_handler("Unknown exception in logger " + _name);
+        throw;
+    }
+}
+
+template <typename... Args>
+inline void spdlog::logger::trace(attrmap_type& ma, const char* fmt, const Args&... args)
+{
+    log(level::trace, ma, fmt, args...);
+}
+
+template <typename... Args>
+inline void spdlog::logger::debug(attrmap_type& ma, const char* fmt, const Args&... args)
+{
+    log(level::debug, ma, fmt, args...);
+}
+
+template <typename... Args>
+inline void spdlog::logger::info(attrmap_type& ma, const char* fmt, const Args&... args)
+{
+    log(level::info, ma, fmt, args...);
+}
+
+template <typename... Args>
+inline void spdlog::logger::warn(attrmap_type& ma, const char* fmt, const Args&... args)
+{
+    log(level::warn, ma, fmt, args...);
+}
+
+template <typename... Args>
+inline void spdlog::logger::error(attrmap_type& ma, const char* fmt, const Args&... args)
+{
+    log(level::err, ma, fmt, args...);
+}
+
+template <typename... Args>
+inline void spdlog::logger::critical(attrmap_type& ma, const char* fmt, const Args&... args)
+{
+    log(level::critical, ma, fmt, args...);
+}
+
+#endif // SPDLOG_ENABLE_LOGMSG_METADATA
+
 
 template<typename T>
 inline void spdlog::logger::trace(const T& msg)
@@ -182,7 +271,6 @@ inline void spdlog::logger::info(const T& msg)
 {
     log(level::info, msg);
 }
-
 
 template<typename T>
 inline void spdlog::logger::warn(const T& msg)
@@ -261,6 +349,64 @@ inline void spdlog::logger::critical(const wchar_t* fmt, const Args&... args)
 {
     log(level::critical, fmt, args...);
 }
+
+#ifdef SPDLOG_ENABLE_LOGMSG_METADATA
+
+template <typename... Args>
+inline void spdlog::logger::log(level::level_enum lvl, attrmap_type& ma, const wchar_t* msg)
+{
+    std::wstring_convert<std::codecvt_utf8<wchar_t> > conv;
+
+    log(lvl, ma, conv.to_bytes(msg));
+}
+
+template <typename... Args>
+inline void spdlog::logger::log(level::level_enum lvl, attrmap_type& ma, const wchar_t* fmt, const Args&... args)
+{
+    fmt::WMemoryWriter wWriter;
+
+    wWriter.write(fmt, args...);
+    log(lvl, ma, wWriter.c_str());
+}
+
+template <typename... Args>
+inline void spdlog::logger::trace(attrmap_type& ma, const wchar_t* fmt, const Args&... args)
+{
+    log(level::trace, ma, fmt, args...);
+}
+
+template <typename... Args>
+inline void spdlog::logger::debug(attrmap_type& ma, const wchar_t* fmt, const Args&... args)
+{
+    log(level::debug, ma, fmt, args...);
+}
+
+template <typename... Args>
+inline void spdlog::logger::info(attrmap_type& ma, const wchar_t* fmt, const Args&... args)
+{
+    log(level::info, ma, fmt, args...);
+}
+
+
+template <typename... Args>
+inline void spdlog::logger::warn(attrmap_type& ma, const wchar_t* fmt, const Args&... args)
+{
+    log(level::warn, ma, fmt, args...);
+}
+
+template <typename... Args>
+inline void spdlog::logger::error(attrmap_type& ma, const wchar_t* fmt, const Args&... args)
+{
+    log(level::err, ma, fmt, args...);
+}
+
+template <typename... Args>
+inline void spdlog::logger::critical(attrmap_type& ma, const wchar_t* fmt, const Args&... args)
+{
+    log(level::critical, ma, fmt, args...);
+}
+
+#endif // SPDLOG_ENABLE_LOGMSG_METADATA
 
 #endif // SPDLOG_WCHAR_TO_UTF8_SUPPORT
 
@@ -350,7 +496,7 @@ inline void spdlog::logger::_default_err_handler(const std::string &msg)
     char date_buf[100];
     std::strftime(date_buf, sizeof(date_buf), "%Y-%m-%d %H:%M:%S", &tm_time);
     details::log_msg  err_msg;
-    err_msg.formatted.write("[*** LOG ERROR ***] [{}] [{}] [{}]{}", name(), msg, date_buf, details::os::eol);
+    err_msg.formatted.write("[*** LOG ERROR ***] [{}] [{}] [{}]{}", name(), msg, date_buf, details::os::default_eol);
     sinks::stderr_sink_mt::instance()->log(err_msg);
     _last_err_time = now;
 }

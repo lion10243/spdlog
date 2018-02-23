@@ -5,13 +5,26 @@
 
 #pragma once
 
+#define SPDLOG_VERSION "0.16.3"
+
+#include "tweakme.h"
+
 #include <string>
 #include <initializer_list>
 #include <chrono>
 #include <memory>
 #include <atomic>
 #include <exception>
-#include<functional>
+#include <functional>
+
+#ifdef SPDLOG_ENABLE_LOGMSG_METADATA
+#include <map>
+#if __cplusplus >= 201701L
+#include <variant>
+#else
+#include <mpark/v1.3.0/variant.hpp>
+#endif // __cplusplus >= 201701L
+#endif // SPDLOG_ENABLE_LOGMSG_METADATA
 
 #if defined(_WIN32) && defined(SPDLOG_WCHAR_FILENAMES)
 #include <codecvt>
@@ -102,6 +115,16 @@ using level_hasher = std::hash<int>;
 
 } //level
 
+#ifdef SPDLOG_ENABLE_LOGMSG_METADATA
+#if __cplusplus >= 201701L
+using attr_type = std::variant<int, float, bool, std::string>;
+namespace attrval = std;
+#else
+using attr_type = mpark::variant<int, float, bool, std::string>;
+namespace attrval = mpark;
+#endif // __cplusplus >= 201701L
+using attrmap_type = std::map<std::string, attr_type>;
+#endif // SPDLOG_ENABLE_LOGMSG_METADATA
 
 //
 // Async overflow policy - block by default.
