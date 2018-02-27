@@ -39,7 +39,7 @@
     <ClCompile Include="test_pattern_formatter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="test_log_attrs.cpp">
+    <ClCompile Include="test_attribute_logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="test_misc.cpp">
