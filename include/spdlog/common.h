@@ -183,7 +183,7 @@ namespace attrval = std;
 using attr_type = mpark::variant<bool, int, long, float, double, std::string>;
 namespace attrval = mpark;
 #endif // __cplusplus >= 201701L
-using attrmap_type = std::map<std::string, attr_type>;
+using attributes_type = std::map<std::string, attr_type>;
 #endif // SPDLOG_ENABLE_LOG_ATTRIBUTES
 
 } //spdlog

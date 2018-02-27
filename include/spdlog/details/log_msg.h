@@ -34,7 +34,7 @@ struct log_msg
     }
 
 #ifdef SPDLOG_ENABLE_LOG_ATTRIBUTES
-    log_msg(const std::string *loggers_name, level::level_enum lvl, attrmap_type&& mamap) :
+    log_msg(const std::string *loggers_name, level::level_enum lvl, attributes_type&& mamap) :
         logger_name(loggers_name),
         level(lvl),
         msg_id(0),
@@ -63,7 +63,7 @@ struct log_msg
     fmt::MemoryWriter formatted;
     size_t msg_id;
 #ifdef SPDLOG_ENABLE_LOG_ATTRIBUTES
-    attrmap_type attrs;
+    attributes_type attrs;
 #endif
 };
 }

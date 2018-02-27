@@ -57,7 +57,7 @@ TEST_CASE("log attr tests", "[log_attrs]")
 {
     SECTION("attributes test") {
         // see "common.h" for supported types
-        spdlog::attrmap_type attrs {
+        spdlog::attributes_type attrs {
             {"param_bool", true},
             {"param_int", 42},
             {"param_long", 42l},

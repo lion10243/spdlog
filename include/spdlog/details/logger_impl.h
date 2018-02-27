@@ -167,7 +167,7 @@ inline void spdlog::logger::critical(const char* fmt, const Arg1 &arg1, const Ar
 #ifdef SPDLOG_ENABLE_LOG_ATTRIBUTES
 
 template<typename T>
-inline void spdlog::logger::log(level::level_enum lvl, attrmap_type& attrs, const T& msg)
+inline void spdlog::logger::log(level::level_enum lvl, attributes_type& attrs, const T& msg)
 {
     if (!should_log(lvl)) return;
     try
@@ -188,7 +188,7 @@ inline void spdlog::logger::log(level::level_enum lvl, attrmap_type& attrs, cons
 }
 
 template <typename... Args>
-inline void spdlog::logger::log(level::level_enum lvl, attrmap_type& attrs, const char* fmt, const Args&... args)
+inline void spdlog::logger::log(level::level_enum lvl, attributes_type& attrs, const char* fmt, const Args&... args)
 {
     if (!should_log(lvl)) return;
 
@@ -215,7 +215,7 @@ inline void spdlog::logger::log(level::level_enum lvl, attrmap_type& attrs, cons
 }
 
 template <typename... Args>
-inline void spdlog::logger::log(level::level_enum lvl, attrmap_type& attrs, const char* msg)
+inline void spdlog::logger::log(level::level_enum lvl, attributes_type& attrs, const char* msg)
 {
     if (!should_log(lvl)) return;
     try
@@ -236,73 +236,73 @@ inline void spdlog::logger::log(level::level_enum lvl, attrmap_type& attrs, cons
 }
 
 template <typename... Args>
-inline void spdlog::logger::trace(attrmap_type& attrs, const char* fmt, const Args&... args)
+inline void spdlog::logger::trace(attributes_type& attrs, const char* fmt, const Args&... args)
 {
     log(level::trace, attrs, fmt, args...);
 }
 
 template <typename... Args>
-inline void spdlog::logger::debug(attrmap_type& attrs, const char* fmt, const Args&... args)
+inline void spdlog::logger::debug(attributes_type& attrs, const char* fmt, const Args&... args)
 {
     log(level::debug, attrs, fmt, args...);
 }
 
 template <typename... Args>
-inline void spdlog::logger::info(attrmap_type& attrs, const char* fmt, const Args&... args)
+inline void spdlog::logger::info(attributes_type& attrs, const char* fmt, const Args&... args)
 {
     log(level::info, attrs, fmt, args...);
 }
 
 template <typename... Args>
-inline void spdlog::logger::warn(attrmap_type& attrs, const char* fmt, const Args&... args)
+inline void spdlog::logger::warn(attributes_type& attrs, const char* fmt, const Args&... args)
 {
     log(level::warn, attrs, fmt, args...);
 }
 
 template <typename... Args>
-inline void spdlog::logger::error(attrmap_type& attrs, const char* fmt, const Args&... args)
+inline void spdlog::logger::error(attributes_type& attrs, const char* fmt, const Args&... args)
 {
     log(level::err, attrs, fmt, args...);
 }
 
 template <typename... Args>
-inline void spdlog::logger::critical(attrmap_type& attrs, const char* fmt, const Args&... args)
+inline void spdlog::logger::critical(attributes_type& attrs, const char* fmt, const Args&... args)
 {
     log(level::critical, attrs, fmt, args...);
 }
 
 template<typename T>
-inline void spdlog::logger::trace(attrmap_type& attrs, const T& msg)
+inline void spdlog::logger::trace(attributes_type& attrs, const T& msg)
 {
     log(level::trace, attrs, msg);
 }
 
 template<typename T>
-inline void spdlog::logger::debug(attrmap_type& attrs, const T& msg)
+inline void spdlog::logger::debug(attributes_type& attrs, const T& msg)
 {
     log(level::debug, attrs, msg);
 }
 
 template<typename T>
-inline void spdlog::logger::info(attrmap_type& attrs, const T& msg)
+inline void spdlog::logger::info(attributes_type& attrs, const T& msg)
 {
     log(level::info, attrs, msg);
 }
 
 template<typename T>
-inline void spdlog::logger::warn(attrmap_type& attrs, const T& msg)
+inline void spdlog::logger::warn(attributes_type& attrs, const T& msg)
 {
     log(level::warn, attrs, msg);
 }
 
 template<typename T>
-inline void spdlog::logger::error(attrmap_type& attrs, const T& msg)
+inline void spdlog::logger::error(attributes_type& attrs, const T& msg)
 {
     log(level::err, attrs, msg);
 }
 
 template<typename T>
-inline void spdlog::logger::critical(attrmap_type& attrs, const T& msg)
+inline void spdlog::logger::critical(attributes_type& attrs, const T& msg)
 {
     log(level::critical, attrs, msg);
 }
@@ -409,7 +409,7 @@ inline void spdlog::logger::critical(const wchar_t* fmt, const Args&... args)
 #ifdef SPDLOG_ENABLE_LOG_ATTRIBUTES
 
 template <typename... Args>
-inline void spdlog::logger::log(level::level_enum lvl, attrmap_type& attrs, const wchar_t* msg)
+inline void spdlog::logger::log(level::level_enum lvl, attributes_type& attrs, const wchar_t* msg)
 {
     std::wstring_convert<std::codecvt_utf8<wchar_t> > conv;
 
@@ -417,7 +417,7 @@ inline void spdlog::logger::log(level::level_enum lvl, attrmap_type& attrs, cons
 }
 
 template <typename... Args>
-inline void spdlog::logger::log(level::level_enum lvl, attrmap_type& attrs, const wchar_t* fmt, const Args&... args)
+inline void spdlog::logger::log(level::level_enum lvl, attributes_type& attrs, const wchar_t* fmt, const Args&... args)
 {
     fmt::WMemoryWriter wWriter;
 
@@ -426,38 +426,38 @@ inline void spdlog::logger::log(level::level_enum lvl, attrmap_type& attrs, cons
 }
 
 template <typename... Args>
-inline void spdlog::logger::trace(attrmap_type& attrs, const wchar_t* fmt, const Args&... args)
+inline void spdlog::logger::trace(attributes_type& attrs, const wchar_t* fmt, const Args&... args)
 {
     log(level::trace, attrs, fmt, args...);
 }
 
 template <typename... Args>
-inline void spdlog::logger::debug(attrmap_type& attrs, const wchar_t* fmt, const Args&... args)
+inline void spdlog::logger::debug(attributes_type& attrs, const wchar_t* fmt, const Args&... args)
 {
     log(level::debug, attrs, fmt, args...);
 }
 
 template <typename... Args>
-inline void spdlog::logger::info(attrmap_type& attrs, const wchar_t* fmt, const Args&... args)
+inline void spdlog::logger::info(attributes_type& attrs, const wchar_t* fmt, const Args&... args)
 {
     log(level::info, attrs, fmt, args...);
 }
 
 
 template <typename... Args>
-inline void spdlog::logger::warn(attrmap_type& attrs, const wchar_t* fmt, const Args&... args)
+inline void spdlog::logger::warn(attributes_type& attrs, const wchar_t* fmt, const Args&... args)
 {
     log(level::warn, attrs, fmt, args...);
 }
 
 template <typename... Args>
-inline void spdlog::logger::error(attrmap_type& attrs, const wchar_t* fmt, const Args&... args)
+inline void spdlog::logger::error(attributes_type& attrs, const wchar_t* fmt, const Args&... args)
 {
     log(level::err, attrs, fmt, args...);
 }
 
 template <typename... Args>
-inline void spdlog::logger::critical(attrmap_type& attrs, const wchar_t* fmt, const Args&... args)
+inline void spdlog::logger::critical(attributes_type& attrs, const wchar_t* fmt, const Args&... args)
 {
     log(level::critical, attrs, fmt, args...);
 }
