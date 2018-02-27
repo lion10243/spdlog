@@ -12,6 +12,7 @@
 #include <string>
 #include <initializer_list>
 #include <chrono>
+#include <map>
 #include <memory>
 #include <atomic>
 #include <exception>
@@ -163,5 +164,8 @@ using filename_t = std::wstring;
 using filename_t = std::string;
 #endif
 
+#ifdef SPDLOG_ENABLE_ATTRIBUTE_LOGGER
+using attributes_type = std::map<std::string, std::string>;
+#endif
 
 } //spdlog

@@ -23,8 +23,6 @@
 namespace spdlog
 {
 
-using attributes_type = std::map<std::string, std::string>;
-
 class attribute_logger SPDLOG_FINAL : public logger
 {
 public:
