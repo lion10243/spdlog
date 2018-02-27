@@ -10,10 +10,7 @@
 
 #include "common.h"
 #include "logger.h"
-
-#ifdef SPDLOG_ENABLE_ATTRIBUTE_LOGGER
 #include "attribute_logger.h"
-#endif
 
 #include <memory>
 #include <functional>
@@ -142,6 +139,14 @@ std::shared_ptr<logger> create_async(const std::string& logger_name, const sink_
 std::shared_ptr<logger> create_async(const std::string& logger_name, sinks_init_list sinks, size_t queue_size, const async_overflow_policy overflow_policy = async_overflow_policy::block_retry, const std::function<void()>& worker_warmup_cb = nullptr, const std::chrono::milliseconds& flush_interval_ms = std::chrono::milliseconds::zero(), const std::function<void()>& worker_teardown_cb = nullptr);
 template<class It>
 std::shared_ptr<logger> create_async(const std::string& logger_name, const It& sinks_begin, const It& sinks_end, size_t queue_size, const async_overflow_policy overflow_policy = async_overflow_policy::block_retry, const std::function<void()>& worker_warmup_cb = nullptr, const std::chrono::milliseconds& flush_interval_ms = std::chrono::milliseconds::zero(), const std::function<void()>& worker_teardown_cb = nullptr);
+
+// Create and register attribute logger with a single sink
+std::shared_ptr<logger> create_attribute(const std::string& logger_name, const sink_ptr& sink);
+
+// Create and register attribute logger with multiple sinks
+std::shared_ptr<logger> create_attribute(const std::string& logger_name, sinks_init_list sinks);
+template<class It>
+std::shared_ptr<logger> create_attribute(const std::string& logger_name, const It& sinks_begin, const It& sinks_end);
 
 // Register the given logger with the given name
 void register_logger(std::shared_ptr<logger> logger);

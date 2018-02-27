@@ -32,10 +32,6 @@ struct log_msg
 #ifndef SPDLOG_NO_THREAD_ID
         thread_id = os::thread_id();
 #endif
-
-#ifdef SPDLOG_ENABLE_ATTRIBUTE_LOGGER
-        attrs = attributes_type();
-#endif
     }
 
 #ifdef SPDLOG_ENABLE_ATTRIBUTE_LOGGER
@@ -68,7 +64,7 @@ struct log_msg
     fmt::MemoryWriter formatted;
     size_t msg_id;
 #ifdef SPDLOG_ENABLE_ATTRIBUTE_LOGGER
-    attributes_type attrs;
+    const attributes_type attrs;
 #endif
 };
 }

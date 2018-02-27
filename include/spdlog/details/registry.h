@@ -13,6 +13,7 @@
 #include "../details/null_mutex.h"
 #include "../logger.h"
 #include "../async_logger.h"
+#include "../attribute_logger.h"
 #include "../common.h"
 
 #include <chrono>
@@ -93,6 +94,27 @@ public:
         return new_logger;
     }
 
+    template<class It>
+    std::shared_ptr<logger> create_attribute(const std::string& logger_name, const It& sinks_begin, const It& sinks_end)
+    {
+        std::lock_guard<Mutex> lock(_mutex);
+        throw_if_exists(logger_name);
+        auto new_logger = std::make_shared<attribute_logger>(logger_name, sinks_begin, sinks_end);
+
+        if (_formatter)
+            new_logger->set_formatter(_formatter);
+
+        if (_err_handler)
+            new_logger->set_error_handler(_err_handler);
+
+        new_logger->set_level(_level);
+        new_logger->flush_on(_flush_level);
+
+        //Add to registry
+        _loggers[logger_name] = new_logger;
+        return new_logger;
+    }
+
     void apply_all(std::function<void(std::shared_ptr<logger>)> fun)
     {
         std::lock_guard<Mutex> lock(_mutex);
@@ -111,6 +133,7 @@ public:
         std::lock_guard<Mutex> lock(_mutex);
         _loggers.clear();
     }
+
     std::shared_ptr<logger> create(const std::string& logger_name, sinks_init_list sinks)
     {
         return create(logger_name, sinks.begin(), sinks.end());
@@ -129,6 +152,16 @@ public:
     std::shared_ptr<async_logger> create_async(const std::string& logger_name, size_t queue_size, const async_overflow_policy overflow_policy, const std::function<void()>& worker_warmup_cb, const std::chrono::milliseconds& flush_interval_ms, const std::function<void()>& worker_teardown_cb, sink_ptr sink)
     {
         return create_async(logger_name, queue_size, overflow_policy, worker_warmup_cb, flush_interval_ms, worker_teardown_cb, { sink });
+    }
+
+    std::shared_ptr<logger> create_attribute(const std::string& logger_name, sinks_init_list sinks)
+    {
+        return create_attribute(logger_name, sinks.begin(), sinks.end());
+    }
+
+    std::shared_ptr<logger> create_attribute(const std::string& logger_name, sink_ptr sink)
+    {
+        return create_attribute(logger_name, { sink });
     }
 
     void formatter(formatter_ptr f)
