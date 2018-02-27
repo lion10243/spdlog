@@ -32,7 +32,28 @@ struct log_msg
 #ifndef SPDLOG_NO_THREAD_ID
         thread_id = os::thread_id();
 #endif
+
+#ifdef SPDLOG_ENABLE_ATTRIBUTE_LOGGER
+        attrs = attributes_type();
+#endif
     }
+
+#ifdef SPDLOG_ENABLE_ATTRIBUTE_LOGGER
+    log_msg(const std::string *loggers_name, level::level_enum lvl, attributes_type&& data) :
+        logger_name(loggers_name),
+        level(lvl),
+        msg_id(0),
+        attrs(data)
+    {
+#ifndef SPDLOG_NO_DATETIME
+        time = os::now();
+#endif
+
+#ifndef SPDLOG_NO_THREAD_ID
+        thread_id = os::thread_id();
+#endif
+    }
+#endif
 
     log_msg(const log_msg& other)  = delete;
     log_msg& operator=(log_msg&& other) = delete;
@@ -47,7 +68,7 @@ struct log_msg
     fmt::MemoryWriter formatted;
     size_t msg_id;
 #ifdef SPDLOG_ENABLE_ATTRIBUTE_LOGGER
-    std::map<std::string, std::string> attrs;
+    attributes_type attrs;
 #endif
 };
 }

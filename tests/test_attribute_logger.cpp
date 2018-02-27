@@ -73,25 +73,23 @@ void FakeLogDaemonSink::log(const spdlog::details::log_msg& msg)
 
 TEST_CASE("attribute_logger test", "[attribute_logger]")
 {
-    SECTION("test attribute_logger can log contextual log metadata") {
-        spdlog::attributes_type metadata {
-            {"ctx_param_one", "meta data for log daemon"},
-            {"ctx_param_two", "extra data"},
-            {"param_string", "spdlog feature test"},
-        };
+    spdlog::attributes_type metadata {
+        {"ctx_param_one", "meta data for log daemon"},
+        {"ctx_param_two", "extra data"},
+        {"param_string", "spdlog feature test"},
+    };
 
-        // construct the logger object
-        std::ostringstream oss;
-        auto oss_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(oss);
-        spdlog::attribute_logger logger("attr_tester", oss_sink);
-        logger.set_level(spdlog::level::info);
-        auto formatter = std::make_shared<spdlog::pattern_formatter>("%v");
-        logger.set_formatter(formatter);
+    // construct the logger object
+    std::ostringstream oss;
+    auto oss_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(oss);
+    spdlog::attribute_logger logger("attr_tester", oss_sink);
+    logger.set_level(spdlog::level::info);
+    auto formatter = std::make_shared<spdlog::pattern_formatter>("%v");
+    logger.set_formatter(formatter);
 
-        // test that attribute_logger can take a key-val map of context data.
-        logger.info(metadata, "formatted log message");
+    // test that attribute_logger can take a key-val map of context data.
+    logger.info(metadata, "formatted log message");
 
-        REQUIRE(true);
-    }
+    REQUIRE(true);
 }
 
