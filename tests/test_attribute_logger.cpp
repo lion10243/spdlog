@@ -20,6 +20,7 @@ void FakeLogDaemon::log(std::string const& msg, metadata_type const& extra) {
         {"context_param_two", extra["ctx_param_two"]},
         {"severity", msg.level},
         {"msgid", msg.msg_id}
+        ...
     }_json;
 
     daemon->write(json);
@@ -29,44 +30,45 @@ void FakeLogDaemon::log(std::string const& msg, metadata_type const& extra) {
 class FakeLogDaemonSink : public spdlog::sinks::sink
 {
 public:
-    void log(const spdlog::details::attr_log_msg&) override;
+    void log(const spdlog::details::log_msg&) override;
     void flush() override;
 private:
-    FakeLogDaemon daemon_;
+    FakeLogDaemon fake_daemon_;
 };
 
 void FakeLogDaemonSink::flush() {}
 
-void FakeLogDaemonSink::log(const spdlog::details::attr_log_msg& msg)
+void FakeLogDaemonSink::log(const spdlog::details::log_msg& msg)
 {
     // first test the message contains the log metadata attributes
     {
         auto iter = msg.attrs.find("ctx_param_one");
         if (iter == msg.attrs.end())
             FAIL("log message missing 'ctx_param_one' attribute");
-        REQUIRE( "meta data for log daemon" == *iter->second );
+        REQUIRE( "meta data for log daemon" == iter->second );
     }
     {
         auto iter = msg.attrs.find("ctx_param_two");
         if (iter == msg.attrs.end())
             FAIL("log message missing 'ctx_param_two' attribute");
-        REQUIRE( "extra data" == *iter->second );
+        REQUIRE( "extra data" == iter->second );
     }
     {
         auto iter = msg.attrs.find("param_string");
         if (iter == msg.attrs.end())
             FAIL("log message missing 'param_string' attribute");
-        REQUIRE( "spdlog feature test" == *iter->second );
+        REQUIRE( "spdlog feature test" == iter->second );
     }
 
     auto extra = msg.attrs;
-    extra["logger"] = msg.logger_name;
     extra["severity"] = spdlog::level::to_str( msg.level );
-    extra["time"] = std::to_string( msg.time.count() );
     extra["msg_id"] = std::to_string( msg.msg_id );
+    using namespace std::chrono;
+    auto time_units = duration_cast<duration<double, seconds::period>>( msg.time.time_since_epoch() ).count();
+    extra["time"] = std::to_string( time_units );
 
-    // pass log 
-    daemon_.log(msg.formatted.str(), extra);
+    // pass log message + extra data to fake log daemon.
+    fake_daemon_.log(msg.formatted.str(), extra);
 }
 
 TEST_CASE("attribute_logger test", "[attribute_logger]")

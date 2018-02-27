@@ -25,11 +25,12 @@ namespace spdlog
 
 using attributes_type = std::map<std::string, std::string>;
 
-} // namespace details
-
 class attribute_logger SPDLOG_FINAL : public logger
 {
 public:
+    // inherit ctors from parent
+    using logger::logger;
+
     template <typename... Args> void log(level::level_enum lvl, attributes_type& attrs, const char* fmt, const Args&... args);
     template <typename... Args> void log(level::level_enum lvl, attributes_type& attrs, const char* msg);
     template <typename... Args> void trace(attributes_type& attrs, const char* fmt, const Args&... args);

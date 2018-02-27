@@ -19,7 +19,8 @@ inline void spdlog::attribute_logger::log(level::level_enum lvl, attributes_type
 
     try
     {
-        details::attr_log_msg log_msg(&_name, lvl, std::move(attrs));
+        details::log_msg log_msg(&_name, lvl);
+        log_msg.attrs = std::move(attrs);
 
 #if defined(SPDLOG_FMT_PRINTF)
         fmt::printf(log_msg.raw, fmt, args...);
@@ -45,7 +46,8 @@ inline void spdlog::attribute_logger::log(level::level_enum lvl, attributes_type
     if (!should_log(lvl)) return;
     try
     {
-        details::attr_log_msg log_msg(&_name, lvl, std::move(attrs));
+        details::log_msg log_msg(&_name, lvl);
+        log_msg.attrs = std::move(attrs);
         log_msg.raw << msg;
         _sink_it(log_msg);
     }
@@ -66,7 +68,8 @@ inline void spdlog::attribute_logger::log(level::level_enum lvl, attributes_type
     if (!should_log(lvl)) return;
     try
     {
-        details::attr_log_msg log_msg(&_name, lvl, std::move(attrs));
+        details::log_msg log_msg(&_name, lvl);
+        log_msg.attrs = std::move(attrs);
         log_msg.raw << msg;
         _sink_it(log_msg);
     }
