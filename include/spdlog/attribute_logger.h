@@ -5,12 +5,12 @@
 
 #pragma once
 
-// Thread safe logger (except for set_pattern(..), set_formatter(..) and set_error_handler())
-// Has name, log level, vector of std::shared sink pointers and formatter
+// Specialisation of logger to allow log attributes (extra data, metadata etc) with log message.
 // Upon each log write the logger:
 // 1. Checks if its log level is enough to log the message
 // 2. Format the message using the formatter function
-// 3. Pass the formatted message to its sinks to performa the actual logging
+// 3. Sets the log attributes on the log message
+// 4. Pass the formatted message to its sinks, along with the extra log attributes, to perform the actual logging
 
 #include "common.h"
 #include "logger.h"
