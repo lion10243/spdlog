@@ -11,6 +11,10 @@
 #include "common.h"
 #include "logger.h"
 
+#ifdef SPDLOG_ENABLE_ATTRIBUTE_LOGGER
+#include "attribute_logger.h"
+#endif
+
 #include <memory>
 #include <functional>
 #include <chrono>

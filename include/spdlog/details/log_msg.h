@@ -9,6 +9,7 @@
 #include "../details/os.h"
 
 
+#include <map>
 #include <string>
 #include <utility>
 
@@ -33,23 +34,6 @@ struct log_msg
 #endif
     }
 
-#ifdef SPDLOG_ENABLE_LOG_ATTRIBUTES
-    log_msg(const std::string *loggers_name, level::level_enum lvl, attrmap_type&& mamap) :
-        logger_name(loggers_name),
-        level(lvl),
-        msg_id(0),
-        attrs( std::move(mamap) )
-    {
-#ifndef SPDLOG_NO_DATETIME
-        time = os::now();
-#endif // SPDLOG_NO_DATETIME
-
-#ifndef SPDLOG_NO_THREAD_ID
-        thread_id = os::thread_id();
-#endif // SPDLOG_NO_THREAD_ID
-    }
-#endif // SPDLOG_ENABLE_LOG_ATTRIBUTES
-
     log_msg(const log_msg& other)  = delete;
     log_msg& operator=(log_msg&& other) = delete;
     log_msg(log_msg&& other) = delete;
@@ -62,8 +46,8 @@ struct log_msg
     fmt::MemoryWriter raw;
     fmt::MemoryWriter formatted;
     size_t msg_id;
-#ifdef SPDLOG_ENABLE_LOG_ATTRIBUTES
-    attrmap_type attrs;
+#ifdef SPDLOG_ENABLE_ATTRIBUTE_LOGGER
+    std::map<std::string, std::string> attrs;
 #endif
 };
 }
