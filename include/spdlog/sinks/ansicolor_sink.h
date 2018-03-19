@@ -5,28 +5,27 @@
 
 #pragma once
 
-#include "base_sink.h"
 #include "../common.h"
 #include "../details/os.h"
+#include "base_sink.h"
 
 #include <string>
 #include <unordered_map>
 
-namespace spdlog
-{
-namespace sinks
-{
+namespace spdlog {
+namespace sinks {
 
 /**
  * This sink prefixes the output with an ANSI escape sequence color code depending on the severity
  * of the message.
  * If no color terminal detected, omit the escape codes.
  */
-template <class Mutex>
-class ansicolor_sink: public base_sink<Mutex>
+template<class Mutex>
+class ansicolor_sink : public base_sink<Mutex>
 {
 public:
-    ansicolor_sink(FILE* file): target_file_(file)
+    explicit ansicolor_sink(FILE *file)
+        : target_file_(file)
     {
         should_do_colors_ = details::os::in_terminal(file) && details::os::is_color_terminal();
         colors_[level::trace] = cyan;
@@ -37,12 +36,13 @@ public:
         colors_[level::critical] = bold + on_red;
         colors_[level::off] = reset;
     }
-    virtual ~ansicolor_sink()
+
+    ~ansicolor_sink() override
     {
         _flush();
     }
 
-    void set_color(level::level_enum color_level, const std::string& color)
+    void set_color(level::level_enum color_level, const std::string &color)
     {
         std::lock_guard<Mutex> lock(base_sink<Mutex>::_mutex);
         colors_[color_level] = color;
@@ -79,13 +79,13 @@ public:
     const std::string on_white = "\033[47m";
 
 protected:
-    virtual void _sink_it(const details::log_msg& msg) override
+    void _sink_it(const details::log_msg &msg) override
     {
         // Wrap the originally formatted message in color codes.
         // If color is not supported in the terminal, log as is instead.
         if (should_do_colors_)
         {
-            const std::string& prefix = colors_[msg.level];
+            const std::string &prefix = colors_[msg.level];
             fwrite(prefix.data(), sizeof(char), prefix.size(), target_file_);
             fwrite(msg.formatted.data(), sizeof(char), msg.formatted.size(), target_file_);
             fwrite(reset.data(), sizeof(char), reset.size(), target_file_);
@@ -102,34 +102,37 @@ protected:
     {
         fflush(target_file_);
     }
-    FILE* target_file_;
+
+    FILE *target_file_;
     bool should_do_colors_;
     std::unordered_map<level::level_enum, std::string, level::level_hasher> colors_;
 };
 
-
 template<class Mutex>
-class ansicolor_stdout_sink: public ansicolor_sink<Mutex>
+class ansicolor_stdout_sink : public ansicolor_sink<Mutex>
 {
 public:
-    ansicolor_stdout_sink(): ansicolor_sink<Mutex>(stdout)
-    {}
+    ansicolor_stdout_sink()
+        : ansicolor_sink<Mutex>(stdout)
+    {
+    }
 };
+
+using ansicolor_stdout_sink_mt = ansicolor_stdout_sink<std::mutex>;
+using ansicolor_stdout_sink_st = ansicolor_stdout_sink<details::null_mutex>;
 
 template<class Mutex>
-class ansicolor_stderr_sink: public ansicolor_sink<Mutex>
+class ansicolor_stderr_sink : public ansicolor_sink<Mutex>
 {
 public:
-    ansicolor_stderr_sink(): ansicolor_sink<Mutex>(stderr)
-    {}
+    ansicolor_stderr_sink()
+        : ansicolor_sink<Mutex>(stderr)
+    {
+    }
 };
 
-typedef ansicolor_stdout_sink<std::mutex> ansicolor_stdout_sink_mt;
-typedef ansicolor_stdout_sink<details::null_mutex> ansicolor_stdout_sink_st;
-
-typedef ansicolor_stderr_sink<std::mutex> ansicolor_stderr_sink_mt;
-typedef ansicolor_stderr_sink<details::null_mutex> ansicolor_stderr_sink_st;
+using ansicolor_stderr_sink_mt = ansicolor_stderr_sink<std::mutex>;
+using ansicolor_stderr_sink_st = ansicolor_stderr_sink<details::null_mutex>;
 
 } // namespace sinks
 } // namespace spdlog
-
