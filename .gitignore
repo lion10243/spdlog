@@ -66,4 +66,7 @@ install_manifest.txt
 
 # idea
 .idea/
-.vscode
+
+# vscode
+.vscode/
+
