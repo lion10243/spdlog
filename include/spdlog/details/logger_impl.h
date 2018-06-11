@@ -352,28 +352,26 @@ inline const std::vector<spdlog::sink_ptr> &spdlog::logger::sinks() const
 template<typename T>
 inline void spdlog::logger::log(level::level_enum lvl, attributes_type &attrs, const T &msg)
 {
-    if (!should_log(lvl)) return;
+    if (!should_log(lvl))
+    {
+        return;
+    }
     try
     {
         details::log_msg log_msg(&_name, lvl, std::move(attrs));
         log_msg.raw << msg;
         _sink_it(log_msg);
     }
-    catch (const std::exception &ex)
-    {
-        _err_handler(ex.what());
-    }
-    catch (...)
-    {
-        _err_handler("Unknown exception in logger " + _name);
-        throw;
-    }
+    SPDLOG_CATCH_AND_HANDLE
 }
 
 template <typename... Args>
 inline void spdlog::logger::log(level::level_enum lvl, attributes_type &attrs, const char *fmt, const Args &... args)
 {
-    if (!should_log(lvl)) return;
+    if (!should_log(lvl))
+    {
+        return;
+    }
 
     try
     {
@@ -386,36 +384,23 @@ inline void spdlog::logger::log(level::level_enum lvl, attributes_type &attrs, c
 #endif
         _sink_it(log_msg);
     }
-    catch (const std::exception &ex)
-    {
-        _err_handler(ex.what());
-    }
-    catch(...)
-    {
-        _err_handler("Unknown exception in logger " + _name);
-        throw;
-    }
+    SPDLOG_CATCH_AND_HANDLE
 }
 
 template <typename... Args>
 inline void spdlog::logger::log(level::level_enum lvl, attributes_type &attrs, const char *msg)
 {
-    if (!should_log(lvl)) return;
+    if (!should_log(lvl))
+    {
+        return;
+    }
     try
     {
         details::log_msg log_msg(&_name, lvl, std::move(attrs));
         log_msg.raw << msg;
         _sink_it(log_msg);
     }
-    catch (const std::exception &ex)
-    {
-        _err_handler(ex.what());
-    }
-    catch (...)
-    {
-        _err_handler("Unknown exception in logger " + _name);
-        throw;
-    }
+    SPDLOG_CATCH_AND_HANDLE
 }
 
 template <typename... Args>
@@ -489,63 +474,5 @@ inline void spdlog::logger::critical(attributes_type &attrs, const T &msg)
 {
     log(level::critical, attrs, msg);
 }
-
-#ifdef SPDLOG_WCHAR_TO_UTF8_SUPPORT
-
-template <typename... Args>
-inline void spdlog::logger::log(level::level_enum lvl, attributes_type &attrs, const wchar_t *msg)
-{
-    std::wstring_convert<std::codecvt_utf8<wchar_t> > conv;
-
-    log(lvl, attrs, conv.to_bytes(msg));
-}
-
-template <typename... Args>
-inline void spdlog::logger::log(level::level_enum lvl, attributes_type &attrs, const wchar_t *fmt, const Args &... args)
-{
-    fmt::WMemoryWriter wWriter;
-
-    wWriter.write(fmt, args...);
-    log(lvl, attrs, wWriter.c_str());
-}
-
-template <typename... Args>
-inline void spdlog::logger::trace(attributes_type &attrs, const wchar_t *fmt, const Args &... args)
-{
-    log(level::trace, attrs, fmt, args...);
-}
-
-template <typename... Args>
-inline void spdlog::logger::debug(attributes_type &attrs, const wchar_t *fmt, const Args &... args)
-{
-    log(level::debug, attrs, fmt, args...);
-}
-
-template <typename... Args>
-inline void spdlog::logger::info(attributes_type &attrs, const wchar_t *fmt, const Args &... args)
-{
-    log(level::info, attrs, fmt, args...);
-}
-
-
-template <typename... Args>
-inline void spdlog::logger::warn(attributes_type &attrs, const wchar_t *fmt, const Args &... args)
-{
-    log(level::warn, attrs, fmt, args...);
-}
-
-template <typename... Args>
-inline void spdlog::logger::error(attributes_type &attrs, const wchar_t *fmt, const Args &... args)
-{
-    log(level::err, attrs, fmt, args...);
-}
-
-template <typename... Args>
-inline void spdlog::logger::critical(attributes_type &attrs, const wchar_t *fmt, const Args &... args)
-{
-    log(level::critical, attrs, fmt, args...);
-}
-
-#endif // SPDLOG_WCHAR_TO_UTF8_SUPPORT
 
 #endif // SPDLOG_ENABLE_LOG_ATTRIBUTES

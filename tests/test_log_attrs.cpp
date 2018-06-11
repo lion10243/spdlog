@@ -1,6 +1,7 @@
 #define SPDLOG_ENABLE_LOG_ATTRIBUTES 1
 
 #include "includes.h"
+#include <iostream>
 
 class NullSink : public spdlog::sinks::sink
 {
@@ -19,7 +20,7 @@ void NullSink::log(const spdlog::details::log_msg& msg)
         auto iter = msg.attrs.find("param_bool");
         if (iter == msg.attrs.end())
             FAIL("log message missing 'param_bool' attribute");
-        REQUIRE( spdlog::attrval::get<double>( iter->second ) );
+        REQUIRE( spdlog::attrval::get<bool>( iter->second ) );
     }
     {
         auto iter = msg.attrs.find("param_int");
@@ -31,7 +32,7 @@ void NullSink::log(const spdlog::details::log_msg& msg)
         auto iter = msg.attrs.find("param_long");
         if (iter == msg.attrs.end())
             FAIL("log message missing 'param_long' attribute");
-        REQUIRE( 42 == spdlog::attrval::get<int>( iter->second ) );
+        REQUIRE( 42 == spdlog::attrval::get<long>( iter->second ) );
     }
     {
         auto iter = msg.attrs.find("param_float");
@@ -55,28 +56,23 @@ void NullSink::log(const spdlog::details::log_msg& msg)
 
 TEST_CASE("log attr tests", "[log_attrs]")
 {
-    SECTION("attributes test") {
-        // see "common.h" for supported types
-        spdlog::attributes_type attrs {
-            {"param_bool", true},
-            {"param_int", 42},
-            {"param_long", 42l},
-            {"param_float", 42.5f},
-            {"param_double", 42.5},
-            {"param_string", "spdlog feature test"},
-        };
+    // see "common.h" for supported types
+    spdlog::attributes_type attrs {
+        {"param_bool", true},
+        {"param_int", 42},
+        {"param_long", 42l},
+        {"param_float", 42.5f},
+        {"param_double", 42.5},
+        {"param_string", std::string("spdlog feature test")},
+    };
 
-        std::ostringstream oss;
-        auto oss_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(oss);
-        spdlog::logger oss_logger("attr_tester", oss_sink);
-        oss_logger.set_level(spdlog::level::info);
-        auto formatter = std::make_shared<spdlog::pattern_formatter>("%v");
-        oss_logger.set_formatter(formatter);
+    auto oss_sink = std::make_shared<NullSink>();
+    spdlog::logger oss_logger("attr_tester", oss_sink);
+    oss_logger.set_level(spdlog::level::info);
 
-        // see NullSink::log above for attribute value checks
-        oss_logger.info(attrs, "Log attributes with log message (attribute values checked in NullSink::log)");
+    // see NullSink::log above for attribute value checks
+    oss_logger.info(attrs, "Log attributes with log message");
 
-        REQUIRE(true);
-    }
+    REQUIRE(true);
 }
 
